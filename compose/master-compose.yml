@@ -1,0 +1,48 @@
+version: '3'
+services:
+    multichain-master:
+      build: ../multichain
+      container_name: multichain-master
+      ports:
+        - "8570:8570"
+        - "8571:8571"
+      environment:
+        - CHAIN_NAME=comphealthchain
+        - CHAIN_RPC_IP=10.5.0.150
+        - CHAIN_RPC_NB_IP=10.5.0.152
+        - CHAIN_RPC_USER=rpcuser
+        - CHAIN_RPC_PASSWORD=comphealth1
+      networks:
+        vpcbr:
+          ipv4_address: 10.5.0.150
+
+    multichain-explorer:
+      build: ../multichain-explorer
+      environment:
+        - CHAIN_MASTER=10.5.0.150
+        - CHAIN_NAME=comphealthchain
+        - CHAIN_RPC_HOST=127.0.0.1
+        - CHAIN_RPC_IP=127.0.0.1
+        - CHAIN_RPC_PORT=8571
+        - CHAIN_RPC_USER=rpcuser
+        - CHAIN_RPC_PASSWORD=comphealth1
+      ports:
+        - "2750:2750"
+      networks:
+        - vpcbr
+
+    multichain-notebook:
+      build: ../jupyter
+      container_name: multichain-notebook
+      ports:
+        - "8888:8888"
+      networks:
+        vpcbr:
+          ipv4_address: 10.5.0.152
+
+networks:
+  vpcbr:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.5.0.0/24
